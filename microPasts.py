@@ -83,24 +83,28 @@ j=len(tasks)
 while(i<j):
     print (i)
     task_id=tasks[i]["id"]
-    res = requests.get('http://crowdsourced.micropasts.org/api/taskrun?task_id='+str(task_id)+'&limit=100')
-    if int(res.headers['X-RateLimit-Remaining']) < 10:
-        time.sleep(300) # Sleep for 5 minutes
-    else:
+    data = [1,2]
+    offset=0
+    while (len(data)>0):
+        res = requests.get('http://crowdsourced.micropasts.org/api/taskrun?task_id='+str(task_id)+'&limit=1&offset='+str(offset))
+        if int(res.headers['X-RateLimit-Remaining']) < 10:
+            time.sleep(300) # Sleep for 5 minutes
+        else:
 
-        data = res.json()
-        t.extend(data)
-        i=i+1
+            data = res.json()
+            t.extend(data)
+            offset=offset+1
+    i=i+1
 ###Save the task runs:
 
         ###Save the tasks as json
 with open('tasksRuns.json', 'w') as outfile:
-    json.dump(tasks, outfile)
+    json.dump(t, outfile)
     
 ###To load the tasks from json file:
     
 with open('tasksRuns.json') as data_file:    
-    tasks = json.load(data_file)
+    t = json.load(data_file)
 
 
 # To write as csv:
